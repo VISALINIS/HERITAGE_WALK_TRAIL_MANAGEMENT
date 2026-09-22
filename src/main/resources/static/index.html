@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Walk | Historic Sites & Curated Walking Trails</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Theme CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg heritage-navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand heritage-brand" href="/index.html">
+                <i class="bi bi-bank2"></i> Heritage Walk
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/heritage.html">Heritage Sites</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/trails.html">Walking Trails</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about-section">About</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center" id="navbar-auth-links">
+                    <!-- Populated dynamically by auth.js -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/login.html"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-heritage-primary btn-sm ms-lg-2" href="/pages/register.html"><i class="bi bi-person-plus me-1"></i>Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="container">
+            <span class="badge bg-warning text-dark px-3 py-2 mb-3 fw-bold text-uppercase letter-spacing">Cultural Heritage Management</span>
+            <h1 class="hero-title">Discover the Stories Behind Our Heritage</h1>
+            <p class="hero-subtitle">
+                Explore historic places, curated walking trails and cultural experiences. Connect with our architectural legacy and share your authentic visitor experiences.
+            </p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="/pages/heritage.html" class="btn btn-heritage-gold btn-lg">
+                    <i class="bi bi-compass me-2"></i>Explore Heritage
+                </a>
+                <a href="/pages/trails.html" class="btn btn-heritage-outline btn-lg">
+                    <i class="bi bi-signpost-2 me-2"></i>Explore Trails
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stat Highlights Bar -->
+    <section class="py-4 bg-white border-bottom shadow-sm">
+        <div class="container">
+            <div class="row g-4 text-center">
+                <div class="col-6 col-md-3">
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-bank fs-2 text-warning"></i>
+                        <div class="text-start">
+                            <h4 class="mb-0 fw-bold" id="ticker-sites">9+</h4>
+                            <small class="text-muted">Monumental Sites</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-signpost fs-2 text-success"></i>
+                        <div class="text-start">
+                            <h4 class="mb-0 fw-bold" id="ticker-trails">3+</h4>
+                            <small class="text-muted">Curated Trails</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-people fs-2 text-primary"></i>
+                        <div class="text-start">
+                            <h4 class="mb-0 fw-bold" id="ticker-visitors">500+</h4>
+                            <small class="text-muted">Active Walkers</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-star-fill fs-2 text-warning"></i>
+                        <div class="text-start">
+                            <h4 class="mb-0 fw-bold" id="ticker-rating">4.8 / 5</h4>
+                            <small class="text-muted">Visitor Rating</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Heritage Section -->
+    <main class="container my-5">
+        <div class="section-header">
+            <h2 class="section-title">Featured Heritage Sites</h2>
+            <p class="section-subtitle">Discover celebrated historical monuments with rich architectural and cultural significance.</p>
+        </div>
+
+        <div class="row g-4" id="featured-sites-grid">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-warning" role="status"></div>
+                <p class="text-muted mt-2">Loading featured sites from database...</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="/pages/heritage.html" class="btn btn-outline-dark px-4 py-2 rounded-pill fw-semibold">
+                Browse All Heritage Sites <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </main>
+
+    <!-- Curated Walking Trails Section -->
+    <section class="py-5 bg-white border-top border-bottom">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Curated Walking Trails</h2>
+                <p class="section-subtitle">Step into living history with ordered trails connecting significant cultural landmarks.</p>
+            </div>
+
+            <div class="row g-4" id="home-trails-grid">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-warning" role="status"></div>
+                    <p class="text-muted mt-2">Loading curated trails...</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="/pages/trails.html" class="btn btn-heritage-primary px-4 py-2 rounded-pill fw-semibold">
+                    Explore All Walking Trails <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="py-5 bg-light" id="about-section">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="badge bg-warning text-dark mb-2 px-3 py-2 fw-bold text-uppercase">Academic Project</span>
+                    <h2 class="fw-bold mb-3" style="font-family: Georgia, serif;">Heritage Walk Trail Content Management & Visitor Feedback Analytics</h2>
+                    <p class="text-muted">
+                        This full-stack platform bridges cultural heritage preservation with interactive digital exploration. Visitors can discover detailed architectural histories, follow curated sequential walking trails, and submit verified feedback.
+                    </p>
+                    <p class="text-muted">
+                        Administrators benefit from a data-driven dashboard calculating real-time visitor sentiment, star rating distributions, and site-by-site engagement metrics directly from MySQL data.
+                    </p>
+                    <div class="row g-3 mt-2">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Curated Trail Stops</h6>
+                                    <small class="text-muted">Ordered itineraries connecting historic landmarks.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Feedback Analytics</h6>
+                                    <small class="text-muted">Rating distributions and performance metrics.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=1000&q=80" alt="Mysore Palace Heritage" class="img-fluid">
+                        <div class="card-body p-4 bg-white">
+                            <h5 class="fw-bold mb-1">Preserving Architectural Marvels</h5>
+                            <p class="text-muted small mb-0">From Mughal forts to Dravidian gopurams and rock-cut Buddhist chaityas across the subcontinent.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="heritage-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <h5 class="d-flex align-items-center gap-2">
+                        <i class="bi bi-bank2 text-warning"></i> Heritage Walk Trail
+                    </h5>
+                    <p class="small text-secondary">
+                        A full-stack web application designed for cultural heritage documentation, walking trail management, and visitor feedback analytics.
+                    </p>
+                    <p class="small text-muted mb-0">
+                        &copy; 2026 Heritage Walk Trail Management System. All rights reserved.
+                    </p>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="/index.html"><i class="bi bi-chevron-right me-1"></i>Home</a></li>
+                        <li class="mb-2"><a href="/pages/heritage.html"><i class="bi bi-chevron-right me-1"></i>Heritage Sites</a></li>
+                        <li class="mb-2"><a href="/pages/trails.html"><i class="bi bi-chevron-right me-1"></i>Walking Trails</a></li>
+                        <li class="mb-2"><a href="/pages/login.html"><i class="bi bi-chevron-right me-1"></i>Sign In</a></li>
+                        <li class="mb-2"><a href="/pages/register.html"><i class="bi bi-chevron-right me-1"></i>Register</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-6">
+                    <h5>Administration</h5>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="/admin/dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Admin Dashboard</a></li>
+                        <li class="mb-2"><a href="/admin/heritage-management.html"><i class="bi bi-building me-1"></i>Manage Sites</a></li>
+                        <li class="mb-2"><a href="/admin/trail-management.html"><i class="bi bi-signpost-2 me-1"></i>Manage Trails</a></li>
+                        <li class="mb-2"><a href="/admin/feedback.html"><i class="bi bi-chat-dots me-1"></i>Visitor Feedback</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Auth Helper JS -->
+    <script src="/js/auth.js"></script>
+    <!-- Home Dynamic Data Loader -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFeaturedSites();
+            loadPreviewTrails();
+        });
+
+        async function loadFeaturedSites() {
+            const grid = document.getElementById('featured-sites-grid');
+            try {
+                const response = await fetch('/api/heritage/featured');
+                const result = await response.json();
+                if (response.ok && result.success && result.data.length > 0) {
+                    const sites = result.data.slice(0, 3);
+                    grid.innerHTML = sites.map(site => `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="heritage-card">
+                                <div class="heritage-card-img-wrap">
+                                    <img src="${site.imageUrl || 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80'}" alt="${escapeHtml(site.name)}" class="heritage-card-img">
+                                    <span class="position-absolute top-0 end-0 m-3 badge bg-dark bg-opacity-75 text-white">
+                                        <i class="bi bi-geo-alt-fill text-warning me-1"></i>${escapeHtml(site.location)}
+                                    </span>
+                                </div>
+                                <div class="heritage-card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="period-badge">${escapeHtml(site.historicalPeriod || 'Historic')}</span>
+                                        <span class="stars-display small">
+                                            <i class="bi bi-star-fill text-warning"></i> ${(site.averageRating || 0).toFixed(1)}
+                                            <small class="text-muted">(${site.feedbackCount || 0})</small>
+                                        </span>
+                                    </div>
+                                    <h5 class="heritage-card-title">${escapeHtml(site.name)}</h5>
+                                    <p class="text-muted small mb-3 text-truncate-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        ${escapeHtml(site.description)}
+                                    </p>
+                                    <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                                        <span class="small text-muted"><i class="bi bi-bank me-1"></i>${escapeHtml(site.architecturalStyle || 'Heritage')}</span>
+                                        <a href="/pages/heritage-details.html?id=${site.id}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                                            Details <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Failed to load featured sites:', err);
+            }
+        }
+
+        async function loadPreviewTrails() {
+            const grid = document.getElementById('home-trails-grid');
+            try {
+                const response = await fetch('/api/trails');
+                const result = await response.json();
+                if (response.ok && result.success && result.data.length > 0) {
+                    const trails = result.data.slice(0, 3);
+                    grid.innerHTML = trails.map(trail => `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="heritage-card">
+                                <div class="heritage-card-img-wrap">
+                                    <img src="${trail.imageUrl || 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800&q=80'}" alt="${escapeHtml(trail.name)}" class="heritage-card-img">
+                                    <span class="position-absolute top-0 start-0 m-3 difficulty-${escapeHtml(trail.difficulty)} shadow-sm">
+                                        ${escapeHtml(trail.difficulty)}
+                                    </span>
+                                    <span class="position-absolute bottom-0 end-0 m-3 badge bg-dark bg-opacity-75 text-white">
+                                        <i class="bi bi-flag-fill text-warning me-1"></i>${trail.stops ? trail.stops.length : 0} Stops
+                                    </span>
+                                </div>
+                                <div class="heritage-card-body">
+                                    <h5 class="heritage-card-title mb-2">${escapeHtml(trail.name)}</h5>
+                                    <p class="text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        ${escapeHtml(trail.description)}
+                                    </p>
+                                    <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                                        <div class="small text-muted">
+                                            <span class="me-2"><i class="bi bi-signpost-2 text-primary me-1"></i>${trail.distance} km</span>
+                                            <span><i class="bi bi-clock text-warning me-1"></i>${trail.estimatedDuration} mins</span>
+                                        </div>
+                                        <a href="/pages/trail-details.html?id=${trail.id}" class="btn btn-heritage-primary btn-sm rounded-pill px-3">
+                                            View Trail <i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Failed to load preview trails:', err);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.toString().replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
