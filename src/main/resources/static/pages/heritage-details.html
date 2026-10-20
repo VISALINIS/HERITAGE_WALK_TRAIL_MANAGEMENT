@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Site Details | Heritage Walk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg heritage-navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand heritage-brand" href="/index.html">
+                <i class="bi bi-bank2"></i> Heritage Walk
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link" href="/index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/pages/heritage.html">Heritage Sites</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/pages/trails.html">Walking Trails</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center" id="navbar-auth-links">
+                    <!-- Populated by auth.js -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container my-5">
+        <!-- Breadcrumb / Back Link -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <a href="/pages/heritage.html" class="text-decoration-none text-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Heritage Sites Catalog
+            </a>
+        </nav>
+
+        <!-- Site Header Card -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-7">
+                <div class="heritage-detail-hero">
+                    <img id="site-hero-img" src="" alt="Heritage Monument" class="img-fluid w-100" style="height: 420px; object-fit: cover;">
+                </div>
+            </div>
+            <div class="col-lg-5 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span id="site-period-badge" class="badge bg-warning bg-opacity-25 text-dark px-3 py-2"></span>
+                        <span id="site-style-badge" class="badge bg-secondary bg-opacity-25 text-dark px-3 py-2"></span>
+                    </div>
+                    <h1 id="site-name" class="fw-bold mb-2" style="font-family: Georgia, serif; color: var(--heritage-primary);"></h1>
+                    <p class="text-muted mb-4 fs-5">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i><span id="site-location-text"></span>
+                    </p>
+
+                    <!-- Score Card -->
+                    <div class="card border bg-light p-3 rounded-3 mb-4 shadow-sm">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <h2 class="mb-0 fw-bold text-dark" id="site-avg-score">0.0</h2>
+                                    <div id="site-avg-stars" class="stars-display fs-5"></div>
+                                </div>
+                                <small class="text-muted" id="site-review-count">Based on 0 reviews</small>
+                            </div>
+                            <button class="btn btn-heritage-gold" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                                <i class="bi bi-star me-1"></i>Give Feedback
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Coordinates Information -->
+                    <div class="mb-3">
+                        <h6 class="text-uppercase text-muted fw-bold small">Geographic Coordinates</h6>
+                        <div id="site-coordinates" class="d-flex align-items-center mt-1">
+                            <span class="text-muted small">Coordinates loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+<!-- Live Weather Card -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-5 bg-white">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h4 class="fw-bold mb-1">
+                <i class="bi bi-cloud-sun text-primary me-2"></i>
+                Weather at This Heritage Site
+            </h4>
+            <p class="text-muted mb-0 small" id="weather-location">
+                Loading location...
+            </p>
+        </div>
+        <span class="badge bg-info-subtle text-dark">
+            Live Weather
+        </span>
+    </div>
+
+    <div id="weather-loading" class="text-muted">
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        Fetching current weather...
+    </div>
+
+    <div id="weather-content" class="d-none">
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3 bg-light h-100">
+                    <div class="text-muted small">Temperature</div>
+                    <h3 id="weather-temperature" class="fw-bold mb-0">--</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3 bg-light h-100">
+                    <div class="text-muted small">Conditions</div>
+                    <h5 id="weather-condition" class="fw-bold mb-0">--</h5>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3 bg-light h-100">
+                    <div class="text-muted small">Humidity</div>
+                    <h3 id="weather-humidity" class="fw-bold mb-0">--</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3 bg-light h-100">
+                    <div class="text-muted small">Wind Speed</div>
+                    <h3 id="weather-wind" class="fw-bold mb-0">--</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7-Day Weather Forecast Section -->
+        <div class="mt-4 pt-3 border-top">
+            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <h6 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-calendar-week text-primary me-2"></i>7-Day Weather Forecast
+                </h6>
+                <small class="text-muted">Daily outlook & walking trail conditions</small>
+            </div>
+            <div class="row g-2 row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-7" id="weather-forecast-container">
+                <!-- 7 Daily forecast cards rendered dynamically by heritage-details.js -->
+            </div>
+        </div>
+
+        <p class="text-muted small mt-3 mb-0" id="weather-updated"></p>
+    </div>
+
+    <div id="weather-error" class="alert alert-warning d-none mt-3 mb-0">
+        Weather is currently unavailable for this location.
+    </div>
+</div>
+
+
+        <!-- Description & Cultural Significance -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                    <h4 class="fw-bold mb-3" style="font-family: Georgia, serif;">Historical Narrative & Description</h4>
+                    <p id="site-description" class="text-secondary leading-relaxed fs-6" style="white-space: pre-line;"></p>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <h4 class="fw-bold mb-3 text-warning" style="font-family: Georgia, serif;">
+                        <i class="bi bi-award me-2"></i>Cultural & Architectural Significance
+                    </h4>
+                    <p id="site-significance" class="text-secondary mb-0 leading-relaxed"></p>
+                </div>
+            </div>
+
+            <!-- Side Card: Quick Action & Walking Trails Link -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <h5 class="fw-bold mb-3" style="font-family: Georgia, serif;">Experience Trails</h5>
+                    <p class="text-muted small">
+                        This historic site is part of our curated heritage walking trails. Join a self-guided trail itinerary to explore interconnected monuments.
+                    </p>
+                    <a href="/pages/trails.html" class="btn btn-outline-dark w-100 rounded-pill">
+                        <i class="bi bi-signpost-2 me-1"></i>View Related Trails
+                    </a>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-white" style="background: linear-gradient(135deg, var(--heritage-navy), var(--heritage-primary));">
+                    <h5 class="fw-bold mb-2">Visitor Guidelines</h5>
+                    <ul class="list-unstyled small opacity-90 mb-0">
+                        <li class="mb-2"><i class="bi bi-clock me-2"></i>Visiting Hours: Sunrise to Sunset</li>
+                        <li class="mb-2"><i class="bi bi-camera me-2"></i>Photography allowed at most courtyards</li>
+                        <li><i class="bi bi-heart me-2"></i>Help preserve our ancient stone carvings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visitor Reviews Section -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                <div>
+                    <h4 class="fw-bold mb-1" style="font-family: Georgia, serif;">Visitor Feedback & Reviews</h4>
+                    <p class="text-muted small mb-0">Real experiences and ratings shared by verified heritage walkers.</p>
+                </div>
+                <button class="btn btn-heritage-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                    <i class="bi bi-pencil-square me-1"></i>Write a Review
+                </button>
+            </div>
+
+            <div id="reviews-list">
+                <div class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm text-warning me-2"></div>Loading visitor reviews...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Feedback Submission Modal -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold" id="feedbackModalLabel" style="font-family: Georgia, serif;">Submit Your Feedback</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="feedback-modal-form">
+                    <div class="modal-body p-4">
+                        <div id="modal-feedback-alert" class="alert d-none"></div>
+
+                        <div class="text-center mb-4">
+                            <label class="form-label fw-semibold text-secondary d-block">Your Star Rating (1 to 5)</label>
+                            <div class="star-rating-input">
+                                <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
+                                <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
+                                <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
+                                <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
+                                <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="feedback-comment" class="form-label fw-semibold text-secondary">Your Experience & Review</label>
+                            <textarea id="feedback-comment" class="form-control" rows="4" placeholder="Describe the atmosphere, architecture, highlights, and any recommendations for fellow walkers..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-heritage-primary px-4">
+                            <i class="bi bi-send me-1"></i>Submit Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="heritage-footer mt-auto">
+        <div class="container text-center py-3">
+            <p class="small text-muted mb-0">&copy; 2026 Heritage Walk Trail Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/heritage-details.js"></script>
+</body>
+</html>

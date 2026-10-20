@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Dashboard | Heritage Walk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg heritage-navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand heritage-brand" href="/index.html">
+                <i class="bi bi-bank2"></i> Heritage Walk
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link" href="/index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/pages/heritage.html">Heritage Sites</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/pages/trails.html">Walking Trails</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center" id="navbar-auth-links">
+                    <!-- Populated by auth.js -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Welcome Header -->
+    <header class="py-4 bg-white border-bottom shadow-sm">
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold mb-1" id="visitor-name-heading" style="font-family: Georgia, serif; color: var(--heritage-primary);">Welcome!</h2>
+                    <p class="text-muted small mb-0">Your personalized visitor portal for tracking reviews and exploring historical trails.</p>
+                </div>
+                <div class="mt-3 mt-md-0 d-flex gap-2">
+                    <a href="/pages/feedback.html" class="btn btn-heritage-gold btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i>Give Feedback
+                    </a>
+                    <a href="/pages/trails.html" class="btn btn-heritage-primary btn-sm">
+                        <i class="bi bi-signpost-2 me-1"></i>Explore Trails
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="container my-5">
+        <!-- Metric Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted fw-bold text-uppercase">My Reviews</small>
+                            <div class="stats-num" id="my-total-reviews">0</div>
+                            <small class="text-secondary">Monuments rated</small>
+                        </div>
+                        <div class="stat-icon-wrap stat-icon-feedback fs-2">
+                            <i class="bi bi-chat-quote-fill text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted fw-bold text-uppercase">My Avg Rating</small>
+                            <div class="stats-num" id="my-avg-rating">0.0</div>
+                            <small class="text-secondary">Across submissions</small>
+                        </div>
+                        <div class="stat-icon-wrap stat-icon-rating fs-2">
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted fw-bold text-uppercase">Curated Trails</small>
+                            <div class="stats-num">3+</div>
+                            <small class="text-secondary">Available itineraries</small>
+                        </div>
+                        <div class="stat-icon-wrap stat-icon-trails fs-2">
+                            <i class="bi bi-compass-fill text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left: Recent Reviews Table -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                    <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0" style="font-family: Georgia, serif;">My Submitted Feedback</h5>
+                        <a href="/pages/my-feedback.html" class="btn btn-outline-secondary btn-sm">View Full History</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Heritage Site</th>
+                                    <th>Rating</th>
+                                    <th>Comment</th>
+                                    <th>Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-feedback-table-body">
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        <div class="spinner-border spinner-border-sm text-warning me-2"></div>Loading your reviews...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Profile Info Card & Actions -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="bg-warning bg-opacity-25 rounded-circle p-3 text-warning">
+                            <i class="bi bi-person-badge fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0" id="profile-name">Visitor</h5>
+                            <span class="badge bg-primary">Registered Visitor</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-2">
+                        <small class="text-muted d-block">Registered Email</small>
+                        <span class="fw-semibold text-secondary" id="profile-email">visitor@example.com</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Member Since</small>
+                        <span class="fw-semibold text-secondary" id="profile-joined">Loading...</span>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm w-100 btn-logout">
+                        <i class="bi bi-box-arrow-right me-1"></i>Sign Out
+                    </button>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-white" style="background: linear-gradient(135deg, var(--heritage-primary), var(--heritage-navy));">
+                    <h5 class="fw-bold mb-2">Did You Know?</h5>
+                    <p class="small opacity-90 mb-3">
+                        Heritage trails help disperse tourism, protect sensitive structures, and support local community heritage artisans.
+                    </p>
+                    <a href="/pages/heritage.html" class="btn btn-light btn-sm text-dark fw-bold rounded-pill">
+                        Find Next Site
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="heritage-footer mt-auto py-3 text-center">
+        <div class="container">
+            <p class="small text-muted mb-0">&copy; 2026 Heritage Walk Trail Management System</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/visitor-dashboard.js"></script>
+</body>
+</html>

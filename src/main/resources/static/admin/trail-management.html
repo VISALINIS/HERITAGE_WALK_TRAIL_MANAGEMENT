@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walking Trails Management | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-brand">
+            <i class="bi bi-shield-lock-fill"></i>
+            <span>Heritage Admin</span>
+        </div>
+        <ul class="admin-nav">
+            <li class="admin-nav-item">
+                <a href="/admin/dashboard.html" class="admin-nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard & Analytics</span>
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="/admin/heritage-management.html" class="admin-nav-link">
+                    <i class="bi bi-building"></i>
+                    <span>Manage Sites</span>
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="/admin/trail-management.html" class="admin-nav-link active">
+                    <i class="bi bi-signpost-2"></i>
+                    <span>Manage Trails</span>
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="/admin/feedback.html" class="admin-nav-link">
+                    <i class="bi bi-chat-dots"></i>
+                    <span>Visitor Feedback</span>
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="/admin/users.html" class="admin-nav-link">
+                    <i class="bi bi-people"></i>
+                    <span>Visitor Accounts</span>
+                </a>
+            </li>
+            <li class="my-3 border-top border-secondary opacity-25"></li>
+            <li class="admin-nav-item">
+                <a href="/index.html" class="admin-nav-link" target="_blank">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <span>View Public Portal</span>
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="#" class="admin-nav-link text-danger btn-logout">
+                    <i class="bi bi-power"></i>
+                    <span>Sign Out</span>
+                </a>
+            </li>
+        </ul>
+        <div class="admin-user-info">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-person-circle fs-4 text-warning"></i>
+                <div class="small">
+                    <div class="fw-bold text-white" id="admin-display-name">Administrator</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">System Admin</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+        <div class="admin-header">
+            <div>
+                <h1 class="admin-title">Walking Trails Management</h1>
+                <p class="text-muted mb-0">Create, edit, and curate ordered heritage trail stops.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAddTrailModal()">
+                <i class="bi bi-plus-lg me-1"></i>Add New Trail
+            </button>
+        </div>
+
+        <!-- Table Card -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="d-flex align-items-center gap-2">
+                    <h5>Registered Walking Trails</h5>
+                    <span class="badge bg-secondary rounded-pill" id="total-trails-count">0</span>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table admin-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Photo</th>
+                            <th>Trail Name & Itinerary</th>
+                            <th>Difficulty</th>
+                            <th>Distance</th>
+                            <th>Duration</th>
+                            <th>Stops</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trails-table-body">
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                <div class="spinner-border spinner-border-sm text-warning me-2"></div>Loading trails...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Trail Modal -->
+    <div class="modal fade" id="trailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold" id="trail-modal-title">Add New Trail</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="trail-form">
+                    <div class="modal-body p-4">
+                        <input type="hidden" id="trail-id">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold">Trail Name *</label>
+                                <input type="text" id="trail-name-input" class="form-control" placeholder="e.g., Mughal Architectural Splendors Walk" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold">Description *</label>
+                                <textarea id="trail-desc-input" class="form-control" rows="3" placeholder="Overview of the historical walking itinerary..." required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Starting Point *</label>
+                                <input type="text" id="trail-start-input" class="form-control" placeholder="e.g., Red Fort Lahori Gate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold">Ending Point *</label>
+                                <input type="text" id="trail-end-input" class="form-control" placeholder="e.g., Taj Mahal East Gate" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold">Distance (km) *</label>
+                                <input type="number" step="0.1" min="0.1" id="trail-dist-input" class="form-control" placeholder="e.g., 14.5" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold">Duration (minutes) *</label>
+                                <input type="number" min="1" id="trail-dur-input" class="form-control" placeholder="e.g., 240" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold">Difficulty Level *</label>
+                                <select id="trail-diff-select" class="form-select" required>
+                                    <option value="EASY">Easy</option>
+                                    <option value="MODERATE">Moderate</option>
+                                    <option value="HARD">Hard</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold">Trail Banner Image URL</label>
+                                <input type="url" id="trail-image-input" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check2 me-1"></i>Save Trail
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Trail Stops Modal -->
+    <div class="modal fade" id="trailStopsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0">Manage Trail Stops</h5>
+                        <small class="text-muted" id="stops-modal-trail-name">Trail Name</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Add Stop Form -->
+                    <div class="p-3 bg-light rounded-3 border mb-4">
+                        <label class="form-label small fw-bold text-secondary">Add Heritage Site as Next Stop</label>
+                        <div class="input-group">
+                            <select id="new-stop-site-select" class="form-select">
+                                <option value="">-- Choose Heritage Site --</option>
+                            </select>
+                            <button class="btn btn-success" type="button" id="btn-add-stop">
+                                <i class="bi bi-plus-lg me-1"></i>Add
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stops List -->
+                    <h6 class="fw-bold mb-2 text-secondary">Ordered Stop Sequence</h6>
+                    <div id="current-stops-list">
+                        <!-- Stops with Move Up/Down/Delete populated dynamically -->
+                    </div>
+                </div>
+                <div class="modal-footer border-top bg-light">
+                    <button type="button" class="btn btn-primary btn-sm px-4" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteTrailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow-lg rounded-4 text-center p-4">
+                <i class="bi bi-exclamation-circle text-danger fs-1 mb-2"></i>
+                <h5 class="fw-bold">Delete Walking Trail?</h5>
+                <p class="text-muted small mb-3">
+                    Are you sure you want to delete <strong id="delete-trail-name"></strong>?
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btn-confirm-delete-trail" class="btn btn-danger btn-sm px-3">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="adminToast" class="toast align-items-center text-bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body" id="toast-message">Success!</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/admin-trails.js"></script>
+</body>
+</html>
