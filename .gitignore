@@ -1,4 +1,14 @@
+# Build files
 target/
+
+# Environment files and secrets
 .env
+.env.*
+!.env.example
+
+# IDE files
 .idea/
 .vscode/
+
+# Logs
+*.log

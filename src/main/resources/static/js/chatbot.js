@@ -62,14 +62,16 @@
 
     // ── Intent detection ──────────────────────────────────────────────────────
     const DURATION_PATTERNS = [
-        { re: /\b(one|1)\s*hour\b/,         maxMins: 60  },
-        { re: /\b(two|2)\s*hours?\b/,        maxMins: 120 },
-        { re: /\b(three|3)\s*hours?\b/,      maxMins: 180 },
-        { re: /\bhalf[\s-]?day\b/,           maxMins: 240 },
-        { re: /\bshort\b/,                   maxMins: 120 },
-        { re: /\bquick\b/,                   maxMins: 90  },
-        { re: /\blong\b/,                    maxMins: 999 },
-        { re: /\bfull[\s-]?day\b/,           maxMins: 999 },
+        { re: /\b(one|1)\s*(hour|hr)s?\b/,         maxMins: 60  },
+        { re: /\b(two|2)\s*(hour|hr)s?\b/,          maxMins: 120 },
+        { re: /\b(three|3)\s*(hour|hr)s?\b/,        maxMins: 180 },
+        { re: /\b(four|4)\s*(hour|hr)s?\b/,         maxMins: 240 },
+        { re: /\b(five|5)\s*(hour|hr)s?\b/,         maxMins: 300 },
+        { re: /\bhalf[\s-]?day\b/,                  maxMins: 240 },
+        { re: /\bshort\b/,                          maxMins: 120 },
+        { re: /\bquick\b/,                          maxMins: 90  },
+        { re: /\blong\b/,                           maxMins: 999 },
+        { re: /\bfull[\s-]?day\b/,                  maxMins: 999 },
     ];
 
     const DIFFICULTY_MAP = {
@@ -95,10 +97,16 @@
         }
 
         // All trails
-        if (/\b(all|list|show|available|every)\b.*\b(trail|walk|route|path)\b/.test(n) ||
-            /\b(trail|walk|route|path)\b.*\b(list|all|show)\b/.test(n) ||
+        if (/\b(all|list|show|available|every|which|what)\b.*\b(trail|walk|route|path)\b/.test(n) ||
+            /\b(trail|walk|route|path)\b.*\b(list|all|show|which|can|suggest|recommend)\b/.test(n) ||
             /\bwalking trail\b/.test(n)) {
-            return { type: 'LIST_TRAILS' };
+            // But only if it's asking to LIST — not duration/difficulty filtered
+            // (duration/difficulty checks happen next, so this handles pure listing)
+            const hasDuration = DURATION_PATTERNS.some(p => p.re.test(n));
+            const hasDifficulty = Object.keys(DIFFICULTY_MAP).some(k => n.includes(k));
+            if (!hasDuration && !hasDifficulty) {
+                return { type: 'LIST_TRAILS' };
+            }
         }
 
         // Trail by difficulty
@@ -124,13 +132,26 @@
             return { type: 'TOP_RATED' };
         }
 
+        // Recommendations / suggestions (elderly, family, kids, first time, beginner)
+        if (/\b(suggest|recommend|recommendation|suggestion|advice|advise)\b/.test(n) ||
+            /\b(elderly|senior|old age|grandparent|grandfather|grandmother|aged)\b/.test(n) ||
+            /\b(family|kids|children|child|toddler|baby|infant)\b/.test(n) ||
+            /\b(first time|beginner|first visit|newbie|never been)\b/.test(n) ||
+            /\b(what should i|where should i|what can i|where can i)\b.*\b(see|visit|go|explore)\b/.test(n) ||
+            /\b(visiting with|coming with|travelling with|traveling with)\b/.test(n)) {
+            // Detect visitor type from query
+            const isElderly = /\b(elderly|senior|old age|grandparent|grandfather|grandmother|aged)\b/.test(n);
+            const isKids    = /\b(kids|children|child|toddler|baby|infant|family)\b/.test(n);
+            return { type: 'RECOMMEND', forElderly: isElderly, forKids: isKids };
+        }
+
         // Sites by location / city
         const locMatch = n.match(/\b(?:sites?|monument|place|heritage)\s+in\s+([a-z ]+)/);
         if (locMatch) return { type: 'BY_LOCATION', city: locMatch[1].trim() };
 
         // "in [city]" general
         const cityMatch = n.match(/\bin\s+([a-z]+(?:\s+[a-z]+)?)\b/);
-        if (cityMatch && !/\b(one|two|three|half|full|trail|walk)\b/.test(cityMatch[1])) {
+        if (cityMatch && !/\b(one|two|three|four|five|half|full|trail|walk|hr|hrs|hour|hours|min|mins|minutes)\b/.test(cityMatch[1])) {
             return { type: 'BY_LOCATION', city: cityMatch[1].trim() };
         }
 
@@ -216,8 +237,10 @@
                 return `👋 Hi! I'm the <strong>Heritage Walk Assistant</strong>.<br><br>
 You can ask me things like:<br>
 • <em>"Tell me about Taj Mahal"</em><br>
-• <em>"Which trail can I explore in one hour?"</em><br>
+• <em>"Which trail can I explore in 3 hours?"</em><br>
 • <em>"Show me easy trails"</em><br>
+• <em>"I'm visiting with elderly parents, suggest places"</em><br>
+• <em>"Recommend something for kids"</em><br>
 • <em>"List all heritage sites"</em><br>
 • <em>"Best rated sites"</em><br>
 • <em>"Sites in Agra"</em><br><br>
@@ -251,7 +274,14 @@ How can I help you today? 😊`;
                     ? kbTrails.filter(t => t.estimatedDuration >= 240)
                     : kbTrails.filter(t => t.estimatedDuration <= intent.maxMins);
                 if (matched.length === 0) {
-                    return `😕 No trails match that duration. Available durations: ${kbTrails.map(t => fmtDuration(t.estimatedDuration)).join(', ')}.`;
+                    // No exact match — find the shortest trail as a closest suggestion
+                    const sorted = [...kbTrails].sort((a, b) => a.estimatedDuration - b.estimatedDuration);
+                    const closest = sorted[0];
+                    const requested = intent.maxMins === 999 ? 'a full day' : `<strong>${fmtDuration(intent.maxMins)}</strong>`;
+                    return `😕 No trail fits within ${requested}.<br><br>
+Our shortest trail takes <strong>${fmtDuration(closest.estimatedDuration)}</strong>. Here's your closest option:<br><br>` +
+                        buildTrailCard(closest) +
+                        `<br><span class="cb-meta">💡 Tip: Try <em>"show all trails"</em> to compare all options.</span>`;
                 }
                 const label = intent.maxMins === 999 ? 'Full-day' : `≤ ${fmtDuration(intent.maxMins)}`;
                 return `⏱ <strong>Trails (${label})</strong><br><br>` +
@@ -289,14 +319,49 @@ You can leave reviews for heritage sites after visiting them.<br>
 • <a href="/pages/visitor-dashboard.html" class="cb-link">Your Dashboard</a><br>
 • <a href="/pages/my-feedback.html" class="cb-link">My Reviews</a>`;
 
+            case 'RECOMMEND': {
+                // Pick the EASY trail as best for elderly/kids/beginners
+                const easyTrails = kbTrails.filter(t => t.difficulty === 'EASY');
+                const bestTrail  = easyTrails.length > 0 ? easyTrails[0] : (kbTrails.length > 0 ? kbTrails[0] : null);
+
+                // Pick highest-rated sites (or first 3 if no ratings)
+                const ratedSites = [...kbSites]
+                    .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
+                    .slice(0, 3);
+
+                let heading, tips;
+                if (intent.forElderly) {
+                    heading = '👴👵 Recommendations for Elderly Visitors';
+                    tips = `<br><span class="cb-meta">💡 <strong>Tips:</strong> Choose the EASY trail for less walking, visit temples during cooler mornings, and carry water.</span>`;
+                } else if (intent.forKids) {
+                    heading = '👨‍👩‍👧 Recommendations for Families with Kids';
+                    tips = `<br><span class="cb-meta">💡 <strong>Tips:</strong> The EASY trail is child-friendly. Caves and palaces are especially exciting for children!</span>`;
+                } else {
+                    heading = '🗺️ Recommended Heritage Experiences';
+                    tips = `<br><span class="cb-meta">💡 Start with the EASY trail if it's your first visit.</span>`;
+                }
+
+                let result = `${heading}<br><br>`;
+                result += `<strong>🥾 Best Trail for You:</strong><br>`;
+                result += bestTrail ? buildTrailCard(bestTrail) : 'No trails available.';
+                result += `<br><strong>⭐ Top Recommended Sites:</strong><br>`;
+                result += ratedSites.map(buildSiteCard).join('');
+                result += tips;
+                return result;
+            }
+
             case 'SITE_INFO': {
                 const site = findSite(intent.query);
                 if (site) return buildSiteCard(site);
-                return `🤔 I couldn't find a specific site for "<em>${escHtml(userText)}</em>".<br><br>
-Try asking:<br>
-• <em>"Tell me about Taj Mahal"</em><br>
-• <em>"List all heritage sites"</em><br>
-• <em>"Sites in Agra"</em>`;
+                // Smart fallback — never a dead end
+                const topSites = [...kbSites]
+                    .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
+                    .slice(0, 3);
+                return `🤔 I'm not sure what you're looking for. Here are our most popular sites:<br><br>` +
+                    topSites.map(s =>
+                        `• <a href="/pages/heritage-details.html?id=${s.id}" class="cb-link" target="_blank">${escHtml(s.name)}</a> — ${escHtml(s.location)}`
+                    ).join('<br>') +
+                    `<br><br><span class="cb-meta">Try: <em>"Tell me about Taj Mahal"</em> | <em>"Show easy trails"</em> | <em>"Help"</em></span>`;
             }
 
             default:
@@ -388,11 +453,51 @@ Try asking:<br>
         input.value = '';
         appendUserMessage(text);
         showTyping();
-        setTimeout(() => {
+        // Call Gemini AI via backend — with rule-based fallback
+        callAI(text);
+    }
+
+    // ── AI call: POST /api/chat → Gemini via Spring Boot backend ─────────────
+    async function callAI(userText) {
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userText })
+            });
+            const data = await res.json();
             removeTyping();
-            const reply = processMessage(text);
-            appendBotMessage(reply);
-        }, 600);
+            if (data.success && data.reply) {
+                // Gemini returns plain text — render as formatted text
+                appendBotMessage(formatAIReply(data.reply));
+            } else {
+                // API returned an error — use local rule-based fallback
+                appendBotMessage(processMessage(userText));
+            }
+        } catch (err) {
+            // Network error — use local rule-based fallback
+            removeTyping();
+            appendBotMessage(processMessage(userText));
+        }
+    }
+
+    // ── Format Gemini plain-text reply into readable HTML ─────────────────────
+    function formatAIReply(text) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            // Bold: **text**
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            // Italic: *text*
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            // Bullet points: lines starting with - or *
+            .replace(/^[-•]\s+(.+)$/gm, '• $1')
+            // URLs → clickable links
+            .replace(/(\/pages\/[^\s"]+)/g, '<a href="$1" class="cb-link" target="_blank">$1</a>')
+            // Line breaks
+            .replace(/\n\n/g, '<br><br>')
+            .replace(/\n/g, '<br>');
     }
 
     function appendUserMessage(text) {
