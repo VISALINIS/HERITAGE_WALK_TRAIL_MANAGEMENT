@@ -738,3 +738,98 @@ main {
 @media (max-width: 420px) {
   #cb-panel { width: calc(100vw - 2rem); right: -0.25rem; }
 }
+
+/* ── Chatbot Comparison Table ── */
+.cb-compare-table {
+  display: grid;
+  grid-template-columns: 110px 1fr 1fr;
+  gap: 0;
+  border: 1.5px solid #d4af37;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0.75rem 0;
+  font-size: 0.78rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+/* Header row */
+.cb-compare-header {
+  display: contents;
+}
+.cb-compare-header span {
+  background: linear-gradient(135deg, #1a3a5c 0%, #2c5282 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.55rem 0.6rem;
+  text-align: center;
+  border-bottom: 2px solid #d4af37;
+}
+.cb-compare-header span:first-child {
+  background: #0f2640;
+}
+
+/* Data rows */
+.cb-compare-row {
+  display: contents;
+}
+.cb-compare-row span {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid #e8e2d9;
+  vertical-align: middle;
+  line-height: 1.4;
+  word-break: break-word;
+  text-align: center;
+  background: #fff;
+}
+.cb-compare-row:last-child span {
+  border-bottom: none;
+}
+
+/* Alternating row shading */
+.cb-compare-row:nth-child(even) span {
+  background: #fdf9f0;
+}
+
+/* Label column */
+.cb-compare-label {
+  text-align: left !important;
+  font-weight: 700;
+  color: #8B4513;
+  background: #faf5ec !important;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  border-right: 1px solid #e8e2d9;
+}
+
+/* Distance links section */
+.cb-distance-links {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  margin-top: 0.5rem;
+  font-size: 0.76rem;
+}
+
+/* View detail links row */
+.cb-compare-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+}
+.cb-compare-actions a {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  background: #1a3a5c;
+  color: #fff !important;
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.73rem;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: background 0.2s;
+}
+.cb-compare-actions a:hover { background: #c9a84c; }

@@ -132,6 +132,11 @@
             return { type: 'TOP_RATED' };
         }
 
+        // Compare two sites — check BEFORE location matchers so "in terms of distance" doesn't confuse things
+        if (/\b(compare|comparison|vs\.?|versus|difference between|which is better|better between)\b/.test(n)) {
+            return { type: 'COMPARE', query: q };
+        }
+
         // Recommendations / suggestions (elderly, family, kids, first time, beginner)
         if (/\b(suggest|recommend|recommendation|suggestion|advice|advise)\b/.test(n) ||
             /\b(elderly|senior|old age|grandparent|grandfather|grandmother|aged)\b/.test(n) ||
@@ -139,19 +144,32 @@
             /\b(first time|beginner|first visit|newbie|never been)\b/.test(n) ||
             /\b(what should i|where should i|what can i|where can i)\b.*\b(see|visit|go|explore)\b/.test(n) ||
             /\b(visiting with|coming with|travelling with|traveling with)\b/.test(n)) {
-            // Detect visitor type from query
             const isElderly = /\b(elderly|senior|old age|grandparent|grandfather|grandmother|aged)\b/.test(n);
             const isKids    = /\b(kids|children|child|toddler|baby|infant|family)\b/.test(n);
             return { type: 'RECOMMEND', forElderly: isElderly, forKids: isKids };
         }
 
+        // User location: "currently in [city]" / "i am in [city]" / "i'm in [city]"
+        // Only captures a SINGLE word as city (no multi-word ambiguity)
+        const userLocMatch = n.match(/\b(?:currently in|i am in|i'm in|iam in|located in)\s+([a-z]+)/);
+        if (userLocMatch) {
+            return { type: 'USER_LOCATION', city: userLocMatch[1].trim(), query: q };
+        }
+
         // Sites by location / city
-        const locMatch = n.match(/\b(?:sites?|monument|place|heritage)\s+in\s+([a-z ]+)/);
+        const locMatch = n.match(/\b(?:sites?|monument|place|heritage)\s+in\s+([a-z]+)/);
         if (locMatch) return { type: 'BY_LOCATION', city: locMatch[1].trim() };
 
-        // "in [city]" general
-        const cityMatch = n.match(/\bin\s+([a-z]+(?:\s+[a-z]+)?)\b/);
-        if (cityMatch && !/\b(one|two|three|four|five|half|full|trail|walk|hr|hrs|hour|hours|min|mins|minutes)\b/.test(cityMatch[1])) {
+        // "in [city]" general — capture only ONE word and check it isn't a filler word
+        const cityMatch = n.match(/\bin\s+([a-z]+)/);
+        const NON_CITY_WORDS = new Set([
+            'one','two','three','four','five','six','seven','eight','nine','ten',
+            'half','full','trail','walk','hr','hrs','hour','hours','min','mins',
+            'minutes','terms','comparison','detail','details','distance','context',
+            'general','total','short','long','the','a','an','my','your','our',
+            'terms','of','and','or','with','from','at','for','to','this','that'
+        ]);
+        if (cityMatch && !NON_CITY_WORDS.has(cityMatch[1])) {
             return { type: 'BY_LOCATION', city: cityMatch[1].trim() };
         }
 
@@ -169,30 +187,34 @@
         return { type: 'SITE_INFO', query: q };
     }
 
-    // ── Site name matcher (fuzzy keyword) ─────────────────────────────────────
+    // ── Site name matcher (fuzzy keyword) — returns best single match ─────────
     function findSite(query) {
+        const results = rankSites(query);
+        return results.length > 0 ? results[0].site : null;
+    }
+
+    // ── Score ALL sites against query, return sorted array {site, score} ──────
+    function rankSites(query) {
         const n = normalise(query);
-        // Remove filler words
-        const cleaned = n.replace(/\b(tell me|about|what is|describe|history of|info|information|show|site|monument|heritage|place)\b/g, ' ').trim();
+        // Strip filler/noise words so site names stand out
+        const cleaned = n.replace(/\b(tell me|about|what is|describe|history of|info|information|show|site|monument|heritage|place|compare|comparison|versus|vs|with|between|and|the|in|of|terms|distance|travel|currently|located|from|i am|i'm|am|is|are)\b/g, ' ')
+                          .replace(/\s{2,}/g, ' ').trim();
 
-        let best = null;
-        let bestScore = 0;
-
-        for (const site of kbSites) {
-            const nameWords = normalise(site.name).split(/\s+/);
-            const locationWords = normalise(site.location || '').split(/\s+/);
-            const allWords = [...nameWords, ...locationWords];
+        const scored = kbSites.map(site => {
+            // Split site name by spaces AND parentheses/punctuation to get individual keywords
+            const nameWords    = normalise(site.name).split(/[\s()\-,]+/).filter(w => w.length > 2);
+            const locationWords= normalise(site.location || '').split(/\s+/).filter(w => w.length > 2);
+            const allWords     = [...nameWords, ...locationWords];
 
             let score = 0;
             for (const word of allWords) {
-                if (word.length > 2 && cleaned.includes(word)) score += word.length; // longer match → higher score
+                if (cleaned.includes(word)) score += word.length; // longer keyword = stronger signal
             }
-            if (score > bestScore) {
-                bestScore = score;
-                best = site;
-            }
-        }
-        return bestScore >= 3 ? best : null; // threshold: at least 3 chars matched
+            return { site, score };
+        });
+
+        // Return only sites with a real match, sorted highest first
+        return scored.filter(s => s.score >= 3).sort((a, b) => b.score - a.score);
     }
 
     // ── Response builders ──────────────────────────────────────────────────────
@@ -298,6 +320,91 @@ Our shortest trail takes <strong>${fmtDuration(closest.estimatedDuration)}</stro
                     sorted.map((s, i) =>
                         `${i + 1}. <a href="/pages/heritage-details.html?id=${s.id}" class="cb-link" target="_blank">${escHtml(s.name)}</a> — ⭐ ${parseFloat(s.averageRating).toFixed(1)} (${s.feedbackCount || 0} reviews)`
                     ).join('<br>');
+            }
+
+            case 'COMPARE': {
+                // Strip noise so site keywords stand out clearly
+                const noiseStripped = intent.query
+                    .replace(/\bin\s+terms\s+of\s+\w+/gi, ' ')
+                    .replace(/\b(?:currently in|i am in|i'm in|iam in|located in)\s+[a-z]+/gi, ' ')
+                    .replace(/\b(?:distance|travel|km|miles?|far|near|close)\b/gi, ' ')
+                    .trim();
+
+                // Extract user's city for Google Maps links
+                const userCityCompMatch = normalise(intent.query).match(
+                    /\b(?:currently in|i am in|i'm in|iam in|located in)\s+([a-z]+)/
+                );
+                const userCityComp = userCityCompMatch ? userCityCompMatch[1] : null;
+
+                // ── Score ALL sites simultaneously and pick the TOP 2 ──────────
+                // This avoids the sequential "find #1, remove, find #2" problem
+                // where the DB name "Mysore Palace (Amba Vilas)" doesn't match
+                // the short form "mysore palace" used in the query.
+                const ranked = rankSites(noiseStripped);
+                const site1 = ranked[0] ? ranked[0].site : null;
+                const site2 = ranked[1] ? ranked[1].site : null;
+
+                if (!site1 || !site2 || site1.id === site2.id) {
+                    if (site1) return `<strong>🏛 ${escHtml(site1.name)}</strong><br><br>${buildSiteCard(site1)}<br><span class="cb-meta">💡 Try: "Compare Taj Mahal with Mysore Palace"</span>`;
+                    return `🤔 I couldn't identify two sites to compare.<br><br><span class="cb-meta">Try: <em>"Compare Taj Mahal with Mysore Palace"</em></span>`;
+                }
+
+                // Build comparison table
+                const fields = [
+                    ['📍 Location',  s => escHtml(s.location)],
+                    ['🕰 Period',    s => escHtml(s.historicalPeriod || 'N/A')],
+                    ['🏗 Style',     s => escHtml(s.architecturalStyle || 'N/A')],
+                    ['⭐ Rating',    s => s.averageRating ? `${parseFloat(s.averageRating).toFixed(1)}/5 (${s.feedbackCount} reviews)` : 'No ratings yet'],
+                ];
+
+                // Title
+                let table = `<div style="font-size:0.9rem;font-weight:700;color:#1a3a5c;margin-bottom:0.4rem;">⚖️ ${escHtml(site1.name)}<br><span style="font-size:0.7rem;color:#888;font-weight:400;">vs</span><br>${escHtml(site2.name)}</div>`;
+
+                // Grid table
+                table += `<div class="cb-compare-table">`;
+                table += `<div class="cb-compare-header"><span></span><span>🏛 ${escHtml(site1.name)}</span><span>🏛 ${escHtml(site2.name)}</span></div>`;
+                fields.forEach(([label, fn]) => {
+                    table += `<div class="cb-compare-row"><span class="cb-compare-label">${label}</span><span>${fn(site1)}</span><span>${fn(site2)}</span></div>`;
+                });
+                table += `</div>`;
+
+                // Distance links (styled box)
+                if (userCityComp) {
+                    const city = userCityComp.charAt(0).toUpperCase() + userCityComp.slice(1);
+                    const mapsBase = 'https://www.google.com/maps/dir/';
+                    const link1 = `${mapsBase}${encodeURIComponent(city)}/${encodeURIComponent(site1.name + ', ' + site1.location)}`;
+                    const link2 = `${mapsBase}${encodeURIComponent(city)}/${encodeURIComponent(site2.name + ', ' + site2.location)}`;
+                    table += `<div class="cb-distance-links">`;
+                    table += `📍 <strong>Distance from ${escHtml(city)}:</strong><br>`;
+                    table += `<a href="${link1}" class="cb-link" target="_blank" style="display:block;margin-top:4px;">🗺 ${escHtml(city)} → ${escHtml(site1.name)}</a>`;
+                    table += `<a href="${link2}" class="cb-link" target="_blank" style="display:block;margin-top:3px;">🗺 ${escHtml(city)} → ${escHtml(site2.name)}</a>`;
+                    table += `</div>`;
+                }
+
+                // Action buttons (full-width, side by side)
+                table += `<div class="cb-compare-actions">`;
+                table += `<a href="/pages/heritage-details.html?id=${site1.id}" target="_blank">View ${escHtml(site1.name)} →</a>`;
+                table += `<a href="/pages/heritage-details.html?id=${site2.id}" target="_blank">View ${escHtml(site2.name)} →</a>`;
+                table += `</div>`;
+                return table;
+            }
+
+            case 'USER_LOCATION': {
+                // User told us their city — find nearest based on description match
+                const userCity = intent.city;
+                // Also try to find sites mentioned in the query
+                const mentionedSite = findSite(intent.query);
+                if (mentionedSite) {
+                    return `📍 You're in <strong>${escHtml(userCity)}</strong>.<br><br>` +
+                        buildSiteCard(mentionedSite) +
+                        `<br><span class="cb-meta">💡 For distance information, check Google Maps for exact travel time from ${escHtml(userCity)}.</span>`;
+                }
+                // Show all sites with their locations
+                return `📍 You're in <strong>${escHtml(userCity)}</strong>. Here are all heritage sites:<br><br>` +
+                    kbSites.map(s =>
+                        `• <a href="/pages/heritage-details.html?id=${s.id}" class="cb-link" target="_blank">${escHtml(s.name)}</a> — ${escHtml(s.location)}`
+                    ).join('<br>') +
+                    `<br><br><span class="cb-meta">💡 Use Google Maps to check distance from ${escHtml(userCity)} to each site.</span>`;
             }
 
             case 'BY_LOCATION': {
